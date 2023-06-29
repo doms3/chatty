@@ -180,7 +180,7 @@ chatty_options_initialize_from_arguments_or_die (struct chatty_options *options,
 
   if (options->mask & CHATTY_NEW_SESSION_MASK)
   {
-    if ((options->mask & CHATTY_PROMPT_MASK) == 0)
+    if ((options->mask & CHATTY_PROMPT_MASK) == 0 || options->prompt == NULL || *options->prompt == '\0')
     {
       fprintf (stderr, "%s: error: --new-session requires --prompt\n", options->progname);
       exit (1);
@@ -189,9 +189,32 @@ chatty_options_initialize_from_arguments_or_die (struct chatty_options *options,
 
   if (options->mask & CHATTY_ONCE_MASK)
   {
-    if ((options->mask & CHATTY_PROMPT_MASK) == 0)
+    if ((options->mask & CHATTY_PROMPT_MASK) == 0 || options->prompt == NULL || *options->prompt == '\0')
     {
       fprintf (stderr, "%s: error: --once requires --prompt\n", options->progname);
+      exit (1);
+    }
+  }
+
+  unsigned int uses_session_mask = CHATTY_NEW_SESSION_MASK | CHATTY_PROMPT_FROM_MASK | CHATTY_DELETE_MASK | CHATTY_EXPORT_MASK | CHATTY_SESSION_MASK | CHATTY_IMPORT_MASK;
+
+  if (options->mask & uses_session_mask)
+  {
+    if (options->session == NULL)
+    {
+      fprintf (stderr, "%s: error: session name must be provided.\n", options->progname);
+      exit (1);
+    }
+
+    if (strlen (options->session) == 0)
+    {
+      fprintf (stderr, "%s: error: session name must not be empty.\n", options->progname);
+      exit (1);
+    }
+
+    if (strcmp (options->session, ".") == 0 || strcmp (options->session, "..") == 0 || strchr (options->session, '/') != NULL || strchr (options->session, '\\') != NULL)
+    {
+      fprintf (stderr, "%s: error: session name must not be \".\" or \"..\" and must not contain a slash or a backslash\n", options->progname);
       exit (1);
     }
   }
@@ -227,7 +250,6 @@ main (int argc, char **argv)
 {
   struct chatty_options options;
   chatty_options_initialize_from_arguments_or_die (&options, argc, argv);
-  
   chatty_initialize_directories ();
 
   unsigned int mask = options.mask;

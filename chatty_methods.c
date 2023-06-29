@@ -35,7 +35,7 @@
 #include "aichat.h"
 #include "chatty_methods.h"
 
-#define CHATTY_MAYBE_DIE(x) if ((x) < 0) do { fprintf(stderr, "%s: %d\n", program_invocation_short_name, -(x)); exit(1); } while (0)
+#define CHATTY_MAYBE_DIE(x) if ((x) < 0) do { fprintf(stderr, "%s: libaichat error code: %d\n", program_invocation_short_name, -(x)); exit(1); } while (0)
 
 static char chatty_home_directory [PATH_MAX];
 static char chatty_session_directory [PATH_MAX];
@@ -164,16 +164,16 @@ chatty_list_sessions (void)
 
     if (found_last_session == false)
     {
-      if (inode == entry->d_ino) // we could have a false positive here if the $CHATTY_HOME/sessions folder
-                                 // is on a different filesystem than the $CHATTY_HOME/.last_session file
-                                 // but that's fine here
+      // we could have a false positive here if the $CHATTY_HOME/sessions folder
+      // is on a different filesystem than the $CHATTY_HOME/.last_session file but that's fine here
+      if (inode == entry->d_ino)
       {
         printf (" (last session)");
         found_last_session = true;
       }
     }
 
-    putchar ('\n');
+    printf ("\n");
   }
 
   closedir (directory);
@@ -298,6 +298,7 @@ chatty_set_last_session (const char *session)
   free (session_path);
   free (last_session_path);
   return;
+
 chatty_set_last_session_error:
   fprintf (stderr, "%s: could not update last session: %s\n", program_invocation_short_name, strerror (errno));
   free (session_path);
@@ -356,8 +357,6 @@ chatty_create_session (const char *sessionname, const char *promptfile)
     fprintf (stderr, "%s: cannot open '%s': %s\n", program_invocation_short_name, promptfile, strerror (errno));
     exit (1);
   }
-
-  FILE *file = chatty_open_session_file_or_die (sessionname, "wx", "use the --session option to extend an existing session");
   
   struct aichat_session session;
   aichat_session_initialize (&session);
@@ -365,8 +364,9 @@ chatty_create_session (const char *sessionname, const char *promptfile)
   fclose (prompt);
 
   CHATTY_MAYBE_DIE (aichat_session_add_message_from_file (&session, AICHAT_ROLE_USER, stdin));
+  FILE *file = chatty_open_session_file_or_die (sessionname, "wx", "use the --session option to extend an existing session");
+  
   chatty_extend_session_helper (&session);
-
   rewind (file);
   CHATTY_MAYBE_DIE (aichat_session_write_to_json_file (&session, file));
   fclose (file);
@@ -425,15 +425,4 @@ chatty_export_session (const char *session)
 
   CHATTY_MAYBE_DIE (aichat_session_write_to_json_file (&chat_session, stdout));
 }
-
-
-// int
-// main (int argc, char ** argv)
-// {
-//   (void) argc;
-//   (void) argv;
-// 
-//   chatty_initialize_directories ();
-//   chatty_create_session ("default", "assets/buisnessanalyst.txt");
-// }
 

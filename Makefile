@@ -9,6 +9,3 @@ LDFLAGS=$(CURL_LIBS) $(JSON_LIBS) -fsanitize=leak
 
 chatty: aichat.o chatty.o chatty_methods.o
 	$(CC) -o $@ $^ $(LDFLAGS)
-
-libaichat-test: aichat.o 
-	$(CC) -o $@ $^ $(LDFLAGS)
