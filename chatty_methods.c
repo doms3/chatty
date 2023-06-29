@@ -20,16 +20,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
+#if defined(__unix__) || defined(__APPLE__) || defined(__MACH__)
 #include <dirent.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#else
+#error "Unsupported platform!"
+#endif
 
 #ifdef __linux__
 #include <linux/limits.h> 
 #elif __APPLE__
 #include <sys/syslimits.h>
+#else
+#error "Unsupported platform!"
 #endif
 
 #include "aichat.h"
