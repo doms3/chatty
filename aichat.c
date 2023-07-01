@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -390,14 +392,19 @@ aichat_api_call_do (const char *data, unsigned long int data_strlen, const char 
 
   if (key)
   {
-    char authorization_prefix [sizeof ("Authorization: Bearer ") + AICHAT_MAX_KEY_LENGTH]
-      = "Authorization: Bearer ";
-  
-    // append the key to the prefix
-    strncat (authorization_prefix, key, AICHAT_MAX_KEY_LENGTH);
+    char *authorization;
+    int length = asprintf (&authorization, "Authorization: Bearer %s", key);
+
+    if (length < 0)
+    {
+      results->error = AICHAT_ERROR_MEMORY;
+      return NULL;
+    }
 
     // add the header
-    headers = curl_slist_append (headers, authorization_prefix);
+    headers = curl_slist_append (headers, authorization);
+
+    free (authorization);
   }
 
   curl_easy_setopt (curl, CURLOPT_URL, "https://api.openai.com/v1/chat/completions");
