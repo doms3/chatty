@@ -131,9 +131,9 @@ chatty_options_initialize_from_arguments_or_die (struct chatty_options *options,
   for (int i = 1; i < argc; i++)
   {
     char *argument = argv [i];
-    char *subargument = NULL;
+    char *subargument = strchr (argument, '=');
 
-    if ((subargument = strchr (argument, '=')))
+    if (subargument)
     {
       *subargument = '\0'; subargument++;
     }
