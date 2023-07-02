@@ -30,15 +30,13 @@
 #define AICHAT_ERROR_SESSION_BUFFER_FULL 2
 #define AICHAT_ERROR_INVALID_CHARACTERS 3
 #define AICHAT_ERROR_NOT_IMPLEMENTED 4
-#define AICHAT_ERROR_CURL_INIT 5
+#define AICHAT_ERROR_CURL_INITIALIZATION 5
 #define AICHAT_ERROR_SESSION_NO_MESSAGES 6
 #define AICHAT_ERROR_SESSION_LAST_MESSAGE_ASSISTANT 7
-#define AICHAT_ERROR_JSON_PARSE_RESPONSE 8
+#define AICHAT_ERROR_JSON_PARSE 8
 #define AICHAT_ERROR_API_ERROR 9
 #define AICHAT_ERROR_API_RESPONSE 10
 #define AICHAT_ERROR_IO 11
-#define AICHAT_ERROR_SESSION_EMPTY 12
-#define AICHAT_ERROR_INVALID_JSON 13
 #define AICHAT_ERROR_MEMORY 14
 
 enum aichat_role { AICHAT_ROLE_SYSTEM, AICHAT_ROLE_USER, AICHAT_ROLE_ASSISTANT };
@@ -81,3 +79,4 @@ int aichat_session_add_message_from_file (struct aichat_session *session, enum a
 int aichat_session_extend (struct aichat_session *session, struct aichat_api_call_results *results);
 int aichat_session_print_last_message (struct aichat_session *session, FILE *file);
 int aichat_session_remove_last_message (struct aichat_session *session);
+const char * aichat_strerror (int error_code);

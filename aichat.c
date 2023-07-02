@@ -67,7 +67,7 @@ aichat_session_initialize_from_json_file (struct aichat_session *session, FILE *
 
   if (object == NULL)
   {
-    return -AICHAT_ERROR_INVALID_JSON;
+    return -AICHAT_ERROR_JSON_PARSE;
   }
 
   json_object *messages = json_object_object_get (object, "messages");
@@ -121,7 +121,7 @@ aichat_session_initialize_from_json_file (struct aichat_session *session, FILE *
 
 aichat_session_initialize_from_json_file_error:
   json_object_put (object);
-  return -AICHAT_ERROR_INVALID_JSON;
+  return -AICHAT_ERROR_JSON_PARSE;
 }
 
 
@@ -177,7 +177,7 @@ int
 aichat_session_print_last_message (struct aichat_session *session, FILE *file)
 {
   if (session->message_count == 0)
-    return -AICHAT_ERROR_SESSION_EMPTY;
+    return -AICHAT_ERROR_SESSION_NO_MESSAGES;
 
   struct aichat_message *message = &session->messages[session->message_count - 1];
 
@@ -190,7 +190,7 @@ int
 aichat_session_remove_last_message (struct aichat_session *session)
 {
   if (session->message_count == 0)
-    return -AICHAT_ERROR_SESSION_EMPTY;
+    return -AICHAT_ERROR_SESSION_NO_MESSAGES;
 
   struct aichat_message *message = &session->messages[session->message_count - 1];
 
@@ -318,7 +318,7 @@ aichat_api_call_state_resolve (struct aichat_api_call_state *state, struct aicha
 
   if (jerr != json_tokener_success)
   {
-    results->error = AICHAT_ERROR_JSON_PARSE_RESPONSE;
+    results->error = AICHAT_ERROR_JSON_PARSE;
     return NULL;
   }
 
@@ -379,7 +379,7 @@ aichat_api_call_do (const char *data, unsigned long int data_strlen, const char 
 
   if (curl == NULL)
   {
-    results->error = AICHAT_ERROR_CURL_INIT;
+    results->error = AICHAT_ERROR_CURL_INITIALIZATION;
     return NULL;
   }
 
@@ -447,4 +447,44 @@ aichat_session_extend (struct aichat_session *session, struct aichat_api_call_re
   free (next_message);
 
   return retval;
-} 
+}
+
+const char *
+aichat_strerror (int error_code)
+{
+  if (error_code >= 0) return "No error";
+  error_code = -error_code;
+
+  switch (error_code)
+  {
+    case AICHAT_ERROR_SESSION_FULL:
+      return "Reached internal limit of messages in session";
+    case AICHAT_ERROR_SESSION_BUFFER_FULL:
+      return "Reached internal limit of combined length of messages in session";
+    case AICHAT_ERROR_INVALID_CHARACTERS:
+      return "Message contains invalid characters";
+    case AICHAT_ERROR_NOT_IMPLEMENTED:
+      return "Not implemented";
+    case AICHAT_ERROR_CURL_INITIALIZATION:
+      return "Failed to initialize libcurl";
+    case AICHAT_ERROR_SESSION_NO_MESSAGES:
+      return "Session has no messages";
+    case AICHAT_ERROR_SESSION_LAST_MESSAGE_ASSISTANT:
+      return "Last message in session was not from the assistant";
+    case AICHAT_ERROR_JSON_PARSE:
+      return "Failed to parse JSON response from API";
+    case AICHAT_ERROR_API_ERROR:
+      return "API returned an error";
+    case AICHAT_ERROR_API_RESPONSE:
+      return "API returned an unexpected response";
+    case AICHAT_ERROR_IO:
+      return "I/O error";
+    case AICHAT_ERROR_MEMORY:
+      return "Memory allocation error";
+    default:
+      return "Unknown error";
+  }
+
+  return "Unknown error";
+}
+

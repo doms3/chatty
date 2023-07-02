@@ -41,7 +41,7 @@
 #include "aichat.h"
 #include "chatty_methods.h"
 
-#define CHATTY_MAYBE_DIE(x) if ((x) < 0) do { fprintf(stderr, "%s: libaichat error code: %d\n", program_invocation_short_name, -(x)); exit(1); } while (0)
+#define CHATTY_MAYBE_DIE(x) if ((x) < 0) do { fprintf (stderr, "%s: %s\n", program_invocation_short_name, aichat_strerror(x)); exit (1); } while (0)
 
 static char chatty_home_directory [PATH_MAX];
 static char chatty_session_directory [PATH_MAX];
