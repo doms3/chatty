@@ -15,6 +15,7 @@
 //  (14) chatty --session=<session name> --rollback                   ; remove the user text and response from the session <session name>
 //  (15) chatty --help                                                ; print this help message
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -80,6 +81,8 @@ chatty_options_argument_parse_or_die (struct chatty_options *options, const char
     CHATTY_PROMPT_MASK,
     CHATTY_ONCE_MASK,
   };
+
+  static_assert (sizeof (argument_masks) / sizeof (argument_masks [0]) == sizeof (arguments) / sizeof (arguments [0]), "argument_masks and arguments must have the same number of elements");
 
   char **argument_subargument_pointer [] =
   {
