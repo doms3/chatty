@@ -19,11 +19,11 @@
  * we can have as many as 4096 messages in a single session.
  ***/
 
-#define AICHAT_MAX_TOKENS 4096
+#define AICHAT_MAX_TOKENS 16384
 #define AICHAT_MAX_CHARACTERS_PER_TOKEN 8
 
 #define AICHAT_SESSION_BUFFER_SIZE (AICHAT_MAX_TOKENS * AICHAT_MAX_CHARACTERS_PER_TOKEN)
-#define AICHAT_SESSION_MAX_MESSAGES 4096 
+#define AICHAT_SESSION_MAX_MESSAGES 1024
 
 // define the error codes
 #define AICHAT_ERROR_SESSION_FULL 1
@@ -40,7 +40,7 @@
 #define AICHAT_ERROR_MEMORY 14
 
 enum aichat_role { AICHAT_ROLE_SYSTEM, AICHAT_ROLE_USER, AICHAT_ROLE_ASSISTANT };
-enum aichat_model { AICHAT_MODEL_GPT_3_5_TURBO };
+enum aichat_model { AICHAT_MODEL_GPT_3_5_TURBO, AICHAT_MODEL_GPT_3_5_TURBO_16K };
 
 struct
 aichat_message

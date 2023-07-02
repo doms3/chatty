@@ -237,8 +237,10 @@ static json_object *
 aichat_session_to_json_object (struct aichat_session *session)
 {
   json_object *jobj = json_object_new_object();
-  
-  json_object_object_add (jobj, "model", json_object_new_string ("gpt-3.5-turbo"));
+
+  const char *model_string = session->model == AICHAT_MODEL_GPT_3_5_TURBO ? "gpt-3.5-turbo" : "gpt-3.5-turbo-16k";
+  json_object_object_add (jobj, "model", json_object_new_string (model_string));
+
   json_object_object_add (jobj, "temperature", json_object_new_double (session->temperature));
 
   json_object *jmsgs = json_object_new_array ();
